@@ -9,6 +9,26 @@
             height: 250px;
         }
     </style>
+    <script>
+        function cleanUp(el) {
+            const value = el.value;
+            let buf = "";
+
+            for (let v of value.split('\n')) {
+                if (v[0] == " ") {
+                    buf += (' ' + v.trim());
+                } else if (v.trim().match(/\d+:\d+/)) {
+                    // skip
+                    // buf += (' ' + v.trim());
+                } else {
+                    buf += ('\n' + v.trim());
+                }
+            }
+
+            el.value = buf;
+            return false;
+        }
+    </script>
 </head>
 
 <body>
@@ -25,7 +45,7 @@
                     <textarea name="tracks" value="Take me Out" id="tracks"></textarea>
                     <br />
 
-                    <input class="button-primary" type="submit" value="Create Playlist">
+                    <input type="button" "button-primary" value="Clean Up Text" onclick="cleanUp(document.querySelector('#tracks'));">&nbsp;<input class="button-primary" type="submit" value="Create Playlist">
                 </fieldset>
             </form>
         </section>
