@@ -12,6 +12,17 @@
             <h1>Hello, <%= me.display_name %>!</h1>
 
             <p>Here is the link to your playlist <a href="<%= playlist.external_urls.spotify %>" target="_blank"><%= playlist.name %> on Spotify</a></p>
+
+            <% if (_.size(missingTracks) > 0) { %>
+                <p>Unfortunately, these tracks were not found on Spotify:</p>
+                <ul>
+                    <% for (t of missingTracks) { %>
+                    <li><%= t %></li>
+                    <% } %>
+                </ul>
+            <% } %>
+
+            <p><a href="/" class="button-primary">Create Another Playlist</a></p>
         </section>
     </main>
 </body>

@@ -84,14 +84,23 @@ app.post('/createPlaylist', async (req, res) => {
 
         const me = (await spotifyApi.getMe()).body;
         const playlist = (await spotifyApi.createPlaylist(me.id, playlistName, {description: description})).body;
-        const trackIds = await Promise.all(tracks.map(async t => {
+
+        const missingTracks = [];
+
+        const trackIds = (await Promise.all(tracks.map(async t => {
             const res = (await spotifyApi.searchTracks(t, {limit: 1})).body.tracks.items;
             // console.log(res);
+            if (_.size(res) == 0) {
+                missingTracks.push(t);
+                return;
+            }
             return res[0].uri;
-        }));
+        }))).filter(t => !_.isEmpty(t));
 
-        await spotifyApi.addTracksToPlaylist(playlist.id, trackIds);
-        return res.send(render('createPlaylist', { me, playlist }));
+        if (_.size(trackIds) > 0) {
+            await spotifyApi.addTracksToPlaylist(playlist.id, trackIds);
+        }
+        return res.send(render('createPlaylist', { me, playlist, missingTracks }));
     } catch (e) {
         console.log(e)
         return res.send({status: 'error', error: e})
