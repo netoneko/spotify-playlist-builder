@@ -6,7 +6,8 @@ const fs = require('fs');
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirectUri = process.env.REDIRECT_URI || 'http://localhost:8080/callback';
+const port = process.env.PORT || 8080;
+const redirectUri = process.env.REDIRECT_URI || `http://localhost:${port}/callback`;
 
 const scopes = ['user-read-private', 'playlist-modify-public'];
 
@@ -106,4 +107,4 @@ app.post('/createPlaylist', async (req, res) => {
     }
 });
 
-app.listen(8080);
+app.listen(port);
