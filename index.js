@@ -6,10 +6,9 @@ const fs = require('fs');
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+const redirectUri = process.env.REDIRECT_URI || 'http://localhost:8080/callback';
 
-const scopes = ['user-read-private', 'playlist-modify-public'],
-    redirectUri = 'http://localhost:8080/callback',
-    state = uuid();
+const scopes = ['user-read-private', 'playlist-modify-public'];
 
 const credentials = {};
 const app = express();
@@ -25,7 +24,7 @@ app.get('/login', (req, res) => {
         redirectUri: redirectUri,
         clientId: clientId
     });
-    const authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+    const authorizeURL = spotifyApi.createAuthorizeURL(scopes, uuid());
     res.redirect(authorizeURL);
 });
 
