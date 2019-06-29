@@ -34,8 +34,11 @@
 <body>
     <main class="wrapper">
         <section class="container">
-            <h1>Hello, <%= me.display_name %>!</h1>
+            <h1>Hello, <%= typeof(me) == "undefined" ? 'dear user' : me.display_name %>!</h1>
 
+            <% if (typeof(me) == "undefined") { %>
+            <p><a href="/login">Log into Spotify</a> to start</p>
+            <% } else { %>
             <p>Please enter a list of songs separated by new lines.</p>
             <p>New playlist on Spotify will be created automatically.</p>
             <form action="/createPlaylist?id=<%= id %>" method="post">
@@ -48,6 +51,7 @@
                     <input type="button" "button-primary" value="Clean Up Text" onclick="cleanUp(document.querySelector('#tracks'));">&nbsp;<input class="button-primary" type="submit" value="Create Playlist">
                 </fieldset>
             </form>
+            <% } %>
         </section>
     </main>
 </body>

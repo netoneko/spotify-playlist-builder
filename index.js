@@ -49,7 +49,7 @@ app.get('/callback', async (req, res) => {
 app.get('/', async (req, res) => {
     const id = req.query.id;
     if (_.isEmpty(id) || _.isEmpty(credentials[id])) {
-        return res.redirect('/login');
+        return res.send(render('index', {}));
     }
 
     const spotifyApi = new SpotifyWebApi({
