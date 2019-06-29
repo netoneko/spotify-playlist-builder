@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+    <style>
+        #tracks {
+            height: 250px;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="wrapper">
+        <section class="container">
+            <h1>Hello, <%= me.display_name %>!</h1>
+
+            <p>Please enter a list of songs separated by new lines.</p>
+            <p>New playlist on Spotify will be created automatically.</p>
+            <form action="/createPlaylist?id=<%= id %>" method="post">
+                <fieldset>
+                    <input type="text" name="playlistName" value="New Playlist"/>
+                    <input type="text" name="description" value="Created by PlaylistBuilder"/>
+                    <textarea name="tracks" value="Take me Out" id="tracks"></textarea>
+                    <br />
+
+                    <input class="button-primary" type="submit" value="Create Playlist">
+                </fieldset>
+            </form>
+        </section>
+    </main>
+</body>
+
+</html>

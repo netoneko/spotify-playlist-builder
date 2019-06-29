@@ -1,6 +1,8 @@
 const SpotifyWebApi = require('spotify-web-api-node');
-const express = require("express");
+const express = require('express');
 const uuid = require('uuid/v4');
+const _ = require('lodash');
+const fs = require('fs');
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -9,15 +11,13 @@ const scopes = ['user-read-private', 'playlist-modify-public'],
     redirectUri = 'http://localhost:8080/callback',
     state = uuid();
 
-// Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
-
-console.log(clientId)
-
-// Create the authorization URL
-
 const credentials = {};
-
 const app = express();
+
+function render(templateName, params) {
+    return _.template(fs.readFileSync(`${__dirname}/templates/${templateName}.html`))(params);
+}
+
 app.use(require('body-parser').urlencoded({ extended: true }));
 
 app.get('/login', (req, res) => {
@@ -26,7 +26,6 @@ app.get('/login', (req, res) => {
         clientId: clientId
     });
     const authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
-    console.log(authorizeURL);
     res.redirect(authorizeURL);
 });
 
@@ -44,13 +43,14 @@ app.get('/callback', async (req, res) => {
         console.log(e);
     }
 
-    console.log(credentials[id]);
-
     res.redirect(`/?id=${id}`);
 });
 
 app.get('/', async (req, res) => {
     const id = req.query.id;
+    if (_.isEmpty(id) || _.isEmpty(credentials[id])) {
+        return res.redirect('/login');
+    }
 
     const spotifyApi = new SpotifyWebApi({
         clientId,
@@ -60,23 +60,14 @@ app.get('/', async (req, res) => {
     });
 
     const me = (await spotifyApi.getMe()).body;
-    res.send(`
-<html>
-<body>
-Hello, ${me.display_name}!
-<form action="/createPlaylist?id=${id}" method="post">
-<textarea name="tracks">
-</textarea>
-<br/>
-<input type="submit">
-</form>
-</body>
-</html>
-    `)
+    res.send(render('index', {me, id}));
 });
 
 app.post('/createPlaylist', async (req, res) => {
-    const id = req.query.id;
+    const { id } = req.query;
+    if (_.isEmpty(credentials[id])) {
+        return res.redirect('/login');
+    }
 
     const spotifyApi = new SpotifyWebApi({
         clientId,
@@ -88,22 +79,23 @@ app.post('/createPlaylist', async (req, res) => {
     try {
         const tracks = req.body.tracks.split('\n').filter(t => t.trim() != '');
         console.log(tracks);
-    
+        const { playlistName, description } = req.body;
+        console.log(playlistName, description);
+
         const me = (await spotifyApi.getMe()).body;
-        const playlist = (await spotifyApi.createPlaylist(me.id, "New playlist", {description: 'Nastya rocks'})).body;
+        const playlist = (await spotifyApi.createPlaylist(me.id, playlistName, {description: description})).body;
         const trackIds = await Promise.all(tracks.map(async t => {
             const res = (await spotifyApi.searchTracks(t, {limit: 1})).body.tracks.items;
-            console.log(res);
+            // console.log(res);
             return res[0].uri;
         }));
 
-        console.log(trackIds);
-        console.log(playlist.id);
         await spotifyApi.addTracksToPlaylist(playlist.id, trackIds);
+        return res.send(render('createPlaylist', { me, playlist }));
     } catch (e) {
         console.log(e)
+        return res.send({status: 'error', error: e})
     }
-    res.send({'status': 'ok'});
 });
 
 app.listen(8080);

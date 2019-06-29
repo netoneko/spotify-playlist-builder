@@ -1,0 +1,19 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+    <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+</head>
+
+<body>
+    <main class="wrapper">
+        <section class="container">
+            <h1>Hello, <%= me.display_name %>!</h1>
+
+            <p>Here is the link to your playlist <a href="<%= playlist.external_urls.spotify %>" target="_blank"><%= playlist.name %> on Spotify</a></p>
+        </section>
+    </main>
+</body>
+
+</html>
