@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "Kirill Maksimov <netoneko@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
